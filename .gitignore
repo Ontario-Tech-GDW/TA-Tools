@@ -1,0 +1,17 @@
+**/desktop.ini
+
+**/obj/**
+**/bin/**
+**/.vs/**
+**/.suo/**
+**.user
+
+shared_assets/**
+
+# Exclusions
+!**/premake5.exe
+!**/dll/**
+!**/external/**/*.lib
+
+
+doxy_output
