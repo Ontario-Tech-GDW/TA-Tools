@@ -127,6 +127,7 @@ bool ZipFile::AddDirectory(const char* path)
 {
 	if (!std::filesystem::is_directory(path)) {
 		fprintf(stderr, "\"%s\" is not a directory", path);
+		return false;
 	}
 
 	std::string relative = std::filesystem::relative(path, rootDir_).string();
@@ -163,6 +164,8 @@ bool ZipFile::AddDirectory(const char* path)
 			AddFile(entry.path().string().c_str());
 		}
 	}
+
+	return true;
 }
 
 void ZipFile::SetRoot(const std::filesystem::path& path) {
