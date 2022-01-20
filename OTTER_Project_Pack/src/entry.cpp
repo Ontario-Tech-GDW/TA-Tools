@@ -9,6 +9,8 @@
 #include <Windows.h>
 #include <conio.h>
 
+#include "zipping.h"
+
 enum ConsoleColor {
 	Black     = 0,
 	Red       = 1,
@@ -191,25 +193,24 @@ int main()
 	std::filesystem::path outFilenamePath = outFilename.str();
 
 	std::cout << "Generating readme..." << std::endl;
-	std::ofstream readme((projPath / "readme.txt").c_str(), std::ios::out | std::ios::app);
-	readme << "=============================================================\n";
-	readme << assignmentName << std::endl;
-	readme << "=============================================================\n";
-	for (int ix = 0; ix < students.size(); ix++) {
-		readme << students[ix].FirstName << " " << students[ix].LastName << " (" << students[ix].StudentId << ")" << std::endl;
+	{
+		std::ofstream readme((projPath / "readme.txt").c_str(), std::ios::out | std::ios::app);
+		readme << "=============================================================\n";
+		readme << assignmentName << std::endl;
+		readme << "=============================================================\n";
+		for (int ix = 0; ix < students.size(); ix++) {
+			readme << students[ix].FirstName << " " << students[ix].LastName << " (" << students[ix].StudentId << ")" << std::endl;
+		}
+		readme.close();
 	}
-	readme.close();
 
+	{
+		ZipFile file((outFilenameStr + ".zip").c_str());
+		file.SetRoot(projPath);
 
-	static char command[4096];
-	sprintf_s(command, "tar -acf \"%s.zip\" -C \"%s\" --exclude='*.vcxproj' --exclude='*.filters' --exclude='*.user' src res readme.txt", outFilenameStr.c_str(), projPath.string().c_str());
-	std::cout << "Invoking command: " << command << std::endl;
-	int retCode = system(command);
-
-	if (retCode != 0) {
-		mode.SetForeColor(Red);
-		std::cout << "Failed to generate zip file!" << std::endl;
-		mode.Reset();
+		file.AddDirectory((projPath / "src/").string().c_str());
+		file.AddDirectory((projPath / "res/").string().c_str());
+		file.AddFile((projPath / "readme.txt").string().c_str());
 	}
 
 	std::cout << "Cleaning temp files" << std::endl;
@@ -220,5 +221,5 @@ int main()
 	std::cout << "Press any key to continue";
 	_getch();
 
-	return retCode;
+	return 1;
 }
